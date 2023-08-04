@@ -7,18 +7,12 @@ import { checkPassword } from '../utils/bcrypt.js';
 export const register = asyncMiddleware(async (req, res, next) => {
     const { username, email, password, role, avatar, friends } = req.body;
 
-    // TODO... If user is Admin it is not allow to add friends!!!
-
-    if (role === 'admin' && friends) {
-        return next(new ErrorResponse(constants.MESSAGE.FRIENDS_NOT_ALLOWED, constants.STATUS_CODE.FORBIDDEN));
-    }
-
     // Create the user
     const user = await User.create({ username, email, password, role, avatar, friends });
 
     // do not return the hashed the password to the user. There should be a way to do this in the User model// TODO...
     // one possible option is to send filteredUser
-    // const { id, username, email, role, avatar, friends, createdAt, updatedAt } = filteredUser;
+    // const { id, username, email, role, avatar, createdAt, updatedAt } = filteredUser;
 
     // Create jwt token by invoking the virtual property on the user instance:
     const token = user.getJWT;
@@ -60,11 +54,14 @@ export const logout = asyncMiddleware(async (req, res, next) => {
 });
 
 export const getProfile = asyncMiddleware(async (req, res, next) => {
-    // the user was already caught in the protect middleware, so no need to retrieve it again
-    const { id, username, email, role, avatar, friends, createdAt, updatedAt } = req.user;
+    // the user was already caught in the protect middleware, but we need to fetch also the friends and send them in the response
+    const { id, username, email, role, avatar, createdAt, updatedAt } = req.user;
+
+    // fetch friends as well and return them:
+
     return res
         .status(constants.STATUS_CODE.SUCCESS)
-        .json({ success: true, message: constants.MESSAGE.PROFILE_RETRIEVED, data: { id, username, email, role, avatar, friends, createdAt, updatedAt } });
+        .json({ success: true, message: constants.MESSAGE.PROFILE_RETRIEVED, data: { id, username, email, role, avatar, createdAt, updatedAt } });
 });
 
 // TODO... If user is Admin it is not allow to add friends!!!

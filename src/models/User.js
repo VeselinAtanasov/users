@@ -55,12 +55,6 @@ const User = sequelize.define('User', {
         type: DataTypes.STRING,
         allowNull: true
     },
-    // this one should be a list of friends. Using array type!
-    friends: {
-        // type: DataTypes.STRING,
-        type: DataTypes.ARRAY(DataTypes.STRING),
-        allowNull: true
-    },
     // add virtual property for creating a JWT for specific user
     getJWT: {
         type: DataTypes.VIRTUAL,
