@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import ErrorResponse from '../utils/ErrorResponse.js';
+import TokenManager from '../utils/TokenManager.js';
 import constants from '../constants/constants.js';
 import User from '../models/User.js';
 
@@ -44,8 +45,22 @@ export const protect = async (req, res, next) => {
         // Verify token:
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const id = decoded.id;
+        const username = decoded.username;
 
+        console.log('jwt decoded: ', decoded);
+
+        // check if token is in black list if it is reject if not continue:
+        const tokenManager = new TokenManager({ username }, token, decoded);
+        const isInBlackList = await tokenManager.checkIfTokenIsInBlackList();
+
+        if (isInBlackList) {
+            return next(new ErrorResponse(constants.MESSAGE.TOKEN_IN_BLACK_LIST, constants.STATUS_CODE.NOT_AUTHORIZED));
+        }
+
+        // TOken verification passed - get the user!
         req.user = await User.findOne({ where: { id } });
+        req.token = token;
+        req.decoded = decoded;
 
         if (!req.user) {
             return next(new ErrorResponse(constants.MESSAGE.INVALID_TOKEN, constants.STATUS_CODE.NOT_AUTHORIZED));
@@ -53,6 +68,6 @@ export const protect = async (req, res, next) => {
 
         next();
     } catch (error) {
-        return next(new ErrorResponse(constants.MESSAGE.NO_ACCESS_TO_ROUTE, constants.STATUS_CODE.NOT_AUTHORIZED));
+        return next(new ErrorResponse(error.message, constants.STATUS_CODE.NOT_AUTHORIZED));
     }
 };

@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import fileUpload from 'express-fileupload';
 import constants from './constants/constants.js';
 import ErrorResponse from './utils/ErrorResponse.js';
 import userRouter from '../src/routers/userRouter.js';
@@ -20,6 +21,9 @@ app.use(syncModels);
 
 // middleware: body parser :
 app.use(express.json());
+
+// add middleware for fileUpload:
+app.use(fileUpload());
 
 // Mount the routers:
 app.use('/users/', userRouter);

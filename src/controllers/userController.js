@@ -6,12 +6,15 @@ import ErrorResponse from '../utils/ErrorResponse.js';
 import constants from '../constants/constants.js';
 import { checkPassword, createHashedPassword } from '../utils/bcrypt.js';
 import removeSensitiveInformation from '../utils/removeSensitiveInformation.js';
+import TokenManager from '../utils/TokenManager.js';
 
 // load process config
 dotenv.config();
 
 export const register = asyncMiddleware(async (req, res, next) => {
     const { username, email, password, role, avatar } = req.body;
+
+    // TODO:... cehck if avatar is passed - if yes uploaded it!
 
     // Create the user
     const user = await User.create({ username, email, password, role, avatar });
@@ -56,9 +59,18 @@ export const login = asyncMiddleware(async (req, res, next) => {
         .json({ success: true, message: constants.MESSAGE.SUCCESS_LOGIN, data: removeSensitiveInformation(user), token });
 });
 
-// TODO
 export const logout = asyncMiddleware(async (req, res, next) => {
-    return res.status(constants.STATUS_CODE.REMOVED).json({ success: true, message: constants.MESSAGE.SUCCESS_LOGOUT, data: [] });
+    // will implement black list for all tokens after logout per userS
+    const tokenManager = new TokenManager(req.user, req.token, req.decoded);
+
+    // Add token in a black list
+    await tokenManager.addTokenInUserBlackList();
+
+    // implement cookie parser and clear the cookie here // TODO...
+
+    return res
+        .status(constants.STATUS_CODE.REMOVED)
+        .json({ success: true, message: constants.MESSAGE.SUCCESS_LOGOUT, data: [] });
 });
 
 export const getProfile = asyncMiddleware(async (req, res, next) => {
@@ -88,6 +100,9 @@ export const updateProfile = asyncMiddleware(async (req, res, next) => {
     if (req.body.password) {
         req.body.password = await createHashedPassword(req.body.password);
     }
+
+    // TODO if the request contains avatar to be uploaded - handle this!
+
     const updatedUser = await user.update(req.body);
 
     return res
@@ -159,4 +174,8 @@ export const removeOwnFriend = asyncMiddleware(async (req, res, next) => {
     return res
         .status(constants.STATUS_CODE.SUCCESS)
         .json({ success: true, message: constants.MESSAGE.FRIEND_REMOVED, data: { removedFriend: friendUserName } });
+});
+
+export const addAvatar = asyncMiddleware(async (req, res, next) => {
+
 });

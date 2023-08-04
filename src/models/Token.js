@@ -3,18 +3,17 @@ import { sequelize } from '../configs/db.js';
 import { DataTypes } from 'sequelize';
 
 const Token = sequelize.define('Token', {
-    id: {
+    username: {
         type: DataTypes.STRING,
         allowNull: false,
         primaryKey: true
     },
-    username: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
+    tokens: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: false
     }
 }, {
-    tableName: 'tokens_whitelist'
+    tableName: 'tokens_blacklist'
 });
 
 export default Token;

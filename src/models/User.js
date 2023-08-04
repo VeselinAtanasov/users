@@ -58,12 +58,12 @@ const User = sequelize.define('User', {
     // add virtual property for creating a JWT for specific user
     getJWT: {
         type: DataTypes.VIRTUAL,
-        get () {
-            return jwt.sign({ id: this.id }, process.env.JWT_SECRET, {
+        get() {
+            return jwt.sign({ id: this.id, username: this.username }, process.env.JWT_SECRET, {
                 expiresIn: process.env.JWT_EXPIRE
             });
         },
-        set (value) {
+        set(value) {
             throw new Error('Do not try to set the `JWT` value!');
         }
     }

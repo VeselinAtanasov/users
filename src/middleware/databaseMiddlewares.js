@@ -1,6 +1,7 @@
 import { testDbConnection, sequelize } from '../configs/db.js';
 import ErrorResponse from '../utils/ErrorResponse.js';
 import constants from '../constants/constants.js';
+import Token from '../models/Token.js';
 
 export const syncDb = async (req, resp, next) => {
     try {
@@ -15,6 +16,7 @@ export const syncDb = async (req, resp, next) => {
 export const syncModels = async (req, res, next) => {
     try {
         // sync the database
+        await Token.sync();
         await sequelize.sync();
         console.log('Models synchronized successfully!');
         return next();
