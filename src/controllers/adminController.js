@@ -2,8 +2,8 @@ import User from '../models/User.js';
 import asyncMiddleware from '../middleware/asyncMiddleware.js';
 import ErrorResponse from '../utils/ErrorResponse.js';
 import constants from '../constants/constants.js';
-import { checkPassword } from '../utils/bcrypt.js';
 import removeSensitiveInformation from '../utils/removeSensitiveInformation.js';
+import paginate from '../utils/paginate.js';
 
 export const createUser = asyncMiddleware(async (req, res, next) => {
     console.log(req.user.toJSON());
@@ -59,6 +59,19 @@ export const getOneUserById = asyncMiddleware(async (req, res, next) => {
 });
 
 export const getAllUsers = asyncMiddleware(async (req, res, next) => {
+    const page = req.query.page || 0;
+    const pageSize = req.query.pageSize || 100;
+
+    // get all users
+    let users = await User.findAll(paginate({}, {
+        page, pageSize
+    }));
+
+    users = users.map((friend) => removeSensitiveInformation(friend));
+
+    return res
+        .status(constants.STATUS_CODE.SUCCESS)
+        .json({ success: true, message: constants.MESSAGE.USERS_RETRIEVED, data: { count: users.length, users } });
 });
 
 // Do not allow admin to modify any other then password!

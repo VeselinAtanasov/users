@@ -36,7 +36,8 @@ export default {
         USER_CREATED_BY_ADMIN: 'User successfully created!',
         MISSING_USER: 'The user does not exist in the database',
         USER_DELETED: 'Use deleted!',
-        USER_RETRIEVED: 'User along with it`s friends is retrieved!'
+        USER_RETRIEVED: 'User along with it`s friends is retrieved!',
+        USERS_RETRIEVED: 'Users retrieved!'
     }
 
 };
