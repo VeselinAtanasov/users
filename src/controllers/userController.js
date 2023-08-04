@@ -4,7 +4,7 @@ import User from '../models/User.js';
 import asyncMiddleware from '../middleware/asyncMiddleware.js';
 import ErrorResponse from '../utils/ErrorResponse.js';
 import constants from '../constants/constants.js';
-import { checkPassword } from '../utils/bcrypt.js';
+import { checkPassword, createHashedPassword } from '../utils/bcrypt.js';
 import removeSensitiveInformation from '../utils/removeSensitiveInformation.js';
 
 // load process config
@@ -18,6 +18,9 @@ export const register = asyncMiddleware(async (req, res, next) => {
 
     // Create jwt token by invoking the virtual property on the user instance:
     const token = user.getJWT;
+
+    // store the token in the database
+
     return res
         .status(constants.STATUS_CODE.CREATED)
         .json({ success: true, message: constants.MESSAGE.SUCCESS_REGISTRATION, data: removeSensitiveInformation(user), token });
@@ -46,9 +49,11 @@ export const login = asyncMiddleware(async (req, res, next) => {
         return next(new ErrorResponse(constants.MESSAGE.INVALID_CREDENTIALS, constants.STATUS_CODE.BAD_REQUEST));
     }
 
+    const token = user.getJWT;
+
     return res
         .status(constants.STATUS_CODE.SUCCESS)
-        .json({ success: true, message: constants.MESSAGE.SUCCESS_LOGIN, data: removeSensitiveInformation(user), token: user.getJWT });
+        .json({ success: true, message: constants.MESSAGE.SUCCESS_LOGIN, data: removeSensitiveInformation(user), token });
 });
 
 // TODO
@@ -74,16 +79,15 @@ export const getProfile = asyncMiddleware(async (req, res, next) => {
 export const updateProfile = asyncMiddleware(async (req, res, next) => {
     const user = req.user;
 
-    // throw error if user try to change the password - only admins can
-    if (req.body.password) {
-        return next(new ErrorResponse(constants.MESSAGE.PASSWORD_CHANGE_NOT_ALLOWED, constants.STATUS_CODE.BAD_REQUEST));
-    }
-
     // not allowed to change your role if you are not an admin
     if (req.user.role === 'user' && req.body.role) {
         return next(new ErrorResponse(constants.MESSAGE.ROLE_CHANGE_NOT_ALLOWED, constants.STATUS_CODE.BAD_REQUEST));
     }
 
+    // Each user can change his own password, but only admin can change other users password
+    if (req.body.password) {
+        req.body.password = await createHashedPassword(req.body.password);
+    }
     const updatedUser = await user.update(req.body);
 
     return res

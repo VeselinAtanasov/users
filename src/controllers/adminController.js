@@ -3,7 +3,6 @@ import asyncMiddleware from '../middleware/asyncMiddleware.js';
 import ErrorResponse from '../utils/ErrorResponse.js';
 import constants from '../constants/constants.js';
 import removeSensitiveInformation from '../utils/removeSensitiveInformation.js';
-import paginate from '../utils/paginate.js';
 
 export const createUser = asyncMiddleware(async (req, res, next) => {
     console.log(req.user.toJSON());
@@ -75,6 +74,6 @@ export const getAllUsers = asyncMiddleware(async (req, res, next) => {
         .json({ success: true, message: constants.MESSAGE.USERS_RETRIEVED, data: { users } });
 });
 
-// Do not allow admin to modify any other then password!
 export const resetPassword = asyncMiddleware(async (req, res, next) => {
+    const {password, username} =req.body
 });
