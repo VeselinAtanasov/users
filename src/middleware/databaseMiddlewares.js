@@ -15,13 +15,12 @@ export const syncDb = async (req, resp, next) => {
 // Not sure if this should be invoked on each request!
 export const syncModels = async (req, res, next) => {
     try {
-        // create association many-to-many, with friends alias;
-        User.belongsToMany(User, { as: 'friends', through: 'user_friend' });
         // await User.sync();
         await sequelize.sync();
-        console.log('User Model synchronization successful!');
+        console.log('Models synchronized successfully!');
         return next();
     } catch (error) {
+        console.log('Error during Models synchronization');
         return next(new ErrorResponse(constants.MESSAGE.MODEL_NOT_SYNCED, constants.STATUS_CODE.SERVICE_UNAVAILABLE));
     }
 };

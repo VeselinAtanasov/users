@@ -16,13 +16,21 @@ export default {
         INVALID_CREDENTIALS: 'Invalid Credentials',
         PROFILE_RETRIEVED: 'Own Profile Retrieved',
         MODEL_NOT_SYNCED: 'Models are not synchronized!',
+        WRONG_INPUT: 'Wrong name of the inputs parameters',
         DB_DOWN: 'Database is down or it is not created!',
         NOT_AUTHORIZED: 'Not authorized to access this route',
+        PASSWORD_CHANGE_NOT_ALLOWED: 'User is not allowed to change the password.',
         ONLY_FOR_ADMIN: 'Not authorized to access this route - only Admins are allowed',
         ONLY_FOR_USERS: 'Not authorized to access this route - only Users are allowed',
         INVALID_TOKEN: 'Invalid Token',
         NO_ACCESS_TO_ROUTE: 'Not authorized to access this route',
-        FRIENDS_NOT_ALLOWED: 'The user you are trying to register is with role: admin. It is not allowed to add friends!'
+        PROFILE_UPDATED: 'The user profile has been updated',
+        FRIENDS_NOT_ALLOWED: 'The user you are trying to register is with role: admin. It is not allowed to add friends!',
+        USER_FRIENDS: 'Friends List Retrieved!',
+        FRIEND_ADDED: 'Friend has been added!',
+        FRIENDS_LIMIT_REACHED: 'Maximum number of friends in own list is reached!',
+        WRONG_FRIEND: 'You are trying to add yourself as friend!',
+        FRIEND_REMOVED: 'You just removed a friend from your list'
     }
 
 };

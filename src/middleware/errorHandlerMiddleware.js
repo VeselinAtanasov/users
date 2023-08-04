@@ -27,6 +27,10 @@ export default (err, req, res, next) => {
         error = new ErrorResponse('Connection Error. Service Unavailable', 400);
     }
 
+    if (err.name === 'TypeError') {
+        error = new ErrorResponse('TypeError', 500);
+    }
+
     res.status(error.statusCode || 500).json({
         success: false,
         error: error.message || 'Server Error',

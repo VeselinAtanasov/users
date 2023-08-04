@@ -78,4 +78,7 @@ User.beforeCreate(async (user, options) => {
     user.password = await createHashedPassword(user.password);
 });
 
+// create association many-to-many, with friends alias. It should be placed here, so it would be created once
+User.belongsToMany(User, { as: 'friends', through: 'user_friend' });
+
 export default User;
