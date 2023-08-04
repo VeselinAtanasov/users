@@ -7,7 +7,8 @@ export default {
         BAD_REQUEST: 400,
         NOT_AUTHORIZED: 401,
         FORBIDDEN: 403,
-        SERVICE_UNAVAILABLE: 503
+        SERVICE_UNAVAILABLE: 503,
+        NOT_FOUND: 404
     },
     MESSAGE: {
         SUCCESS_LOGIN: 'Successful Login',
@@ -20,6 +21,7 @@ export default {
         DB_DOWN: 'Database is down or it is not created!',
         NOT_AUTHORIZED: 'Not authorized to access this route',
         PASSWORD_CHANGE_NOT_ALLOWED: 'User is not allowed to change the password.',
+        ROLE_CHANGE_NOT_ALLOWED: 'User is not allowed to change it`s role. Only Admin can',
         ONLY_FOR_ADMIN: 'Not authorized to access this route - only Admins are allowed',
         ONLY_FOR_USERS: 'Not authorized to access this route - only Users are allowed',
         INVALID_TOKEN: 'Invalid Token',
@@ -30,7 +32,11 @@ export default {
         FRIEND_ADDED: 'Friend has been added!',
         FRIENDS_LIMIT_REACHED: 'Maximum number of friends in own list is reached!',
         WRONG_FRIEND: 'You are trying to add yourself as friend!',
-        FRIEND_REMOVED: 'You just removed a friend from your list'
+        FRIEND_REMOVED: 'You just removed a friend from your list',
+        USER_CREATED_BY_ADMIN: 'User successfully created!',
+        MISSING_USER: 'The user does not exist in the database',
+        USER_DELETED: 'Use deleted!',
+        USER_RETRIEVED: 'User along with it`s friends is retrieved!'
     }
 
 };

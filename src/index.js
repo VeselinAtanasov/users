@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 
 import userRouter from '../src/routers/userRouter.js';
+import adminRouter from '../src/routers/adminRouter.js';
 import { syncDb, syncModels } from './middleware/databaseMiddlewares.js';
 import errorHandler from './middleware/errorHandlerMiddleware.js';
 
@@ -21,6 +22,7 @@ app.use(express.json());
 
 // Mount the routers:
 app.use('/users/', userRouter);
+app.use('/admin/', adminRouter);
 
 // use customer error handler, which will handle all uncaught errors .
 // should be last in the app so will handle errors from controllers!

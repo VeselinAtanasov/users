@@ -11,10 +11,10 @@ import removeSensitiveInformation from '../utils/removeSensitiveInformation.js';
 dotenv.config();
 
 export const register = asyncMiddleware(async (req, res, next) => {
-    const { username, email, password, role, avatar, friends } = req.body;
+    const { username, email, password, role, avatar } = req.body;
 
     // Create the user
-    const user = await User.create({ username, email, password, role, avatar, friends });
+    const user = await User.create({ username, email, password, role, avatar });
 
     // Create jwt token by invoking the virtual property on the user instance:
     const token = user.getJWT;
@@ -77,6 +77,11 @@ export const updateProfile = asyncMiddleware(async (req, res, next) => {
     // throw error if user try to change the password - only admins can
     if (req.body.password) {
         return next(new ErrorResponse(constants.MESSAGE.PASSWORD_CHANGE_NOT_ALLOWED, constants.STATUS_CODE.BAD_REQUEST));
+    }
+
+    // not allowed to change your role if you are not an admin
+    if (req.user.role === 'user' && req.body.role) {
+        return next(new ErrorResponse(constants.MESSAGE.ROLE_CHANGE_NOT_ALLOWED, constants.STATUS_CODE.BAD_REQUEST));
     }
 
     const updatedUser = await user.update(req.body);

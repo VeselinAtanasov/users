@@ -1,5 +1,4 @@
 import { testDbConnection, sequelize } from '../configs/db.js';
-import User from '../models/User.js';
 import ErrorResponse from '../utils/ErrorResponse.js';
 import constants from '../constants/constants.js';
 
@@ -15,7 +14,7 @@ export const syncDb = async (req, resp, next) => {
 // Not sure if this should be invoked on each request!
 export const syncModels = async (req, res, next) => {
     try {
-        // await User.sync();
+        // sync the database
         await sequelize.sync();
         console.log('Models synchronized successfully!');
         return next();
