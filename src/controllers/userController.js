@@ -1,52 +1,87 @@
 import User from '../models/User.js';
+import asyncMiddleware from '../middleware/asyncMiddleware.js';
+import ErrorResponse from '../utils/ErrorResponse.js';
+import constants from '../constants/constants.js';
 import { checkPassword } from '../utils/bcrypt.js';
 
-export const register = async (req, res, next) => {
-    try {
-        const { username, email, password, role, avatar, friends } = req.body;
+export const register = asyncMiddleware(async (req, res, next) => {
+    const { username, email, password, role, avatar, friends } = req.body;
 
-        // Create the user
-        const user = await User.create({ username, email, password, role, avatar, friends });
+    // TODO... If user is Admin it is not allow to add friends!!!
 
-        // do not return the hashed the password to the user. There should be a way to do this in the User model// TODO...
-
-        // Create jwt token by invoking the virtual property on the user instance:
-        const token = user.getJWT;
-        return res.status(200).json({ success: true, message: 'Successful Registration', data: user, token });
-    } catch (error) {
-        return res.status(200).json({ success: false, message: 'Error', data: error });
+    if (role === 'admin' && friends) {
+        return next(new ErrorResponse(constants.MESSAGE.FRIENDS_NOT_ALLOWED, constants.STATUS_CODE.FORBIDDEN));
     }
-};
 
-export const login = async (req, res, next) => {
-    try {
-        const { username, password } = req.body;
+    // Create the user
+    const user = await User.create({ username, email, password, role, avatar, friends });
 
-        // Check for valid input and return error if true
-        if (!username || !password) {
+    // do not return the hashed the password to the user. There should be a way to do this in the User model// TODO...
+    // one possible option is to send filteredUser
+    // const { id, username, email, role, avatar, friends, createdAt, updatedAt } = filteredUser;
 
-        }
+    // Create jwt token by invoking the virtual property on the user instance:
+    const token = user.getJWT;
+    return res
+        .status(constants.STATUS_CODE.CREATED)
+        .json({ success: true, message: constants.MESSAGE.SUCCESS_REGISTRATION, data: user, token });
+});
 
-        const user = await User.findOne({ where: { username } });
-        // Check is user exists and return error for invalid credentials
-        // if (!user) {
-        //  }
-        console.log(JSON.stringify(user));
+export const login = asyncMiddleware(async (req, res, next) => {
+    const { username, password } = req.body;
 
-        // Check password:
-        const isMatched = await checkPassword(user.password, password);
-
-        // Check if password matched and if no return error for invalid credentials
-        if (!isMatched) {
-
-        }
-
-        return res.status(200).json({ success: true, message: 'Success', data: [], token: user.getJWT });
-    } catch (error) {
-        return res.status(200).json({ success: false, message: 'Error', data: [] });
+    // Check for valid input and return error if true
+    if (!username || !password) {
+        return next(new ErrorResponse(constants.MESSAGE.INVALID_CREDENTIALS, constants.STATUS_CODE.BAD_REQUEST));
     }
-};
 
-export const logout = async (req, res, next) => {
-    return res.status(200).json({ success: true, message: 'Successful Logout', data: [] });
-};
+    const user = await User.findOne({ where: { username } });
+
+    // Check is user exists and return error for invalid credentials
+    if (!user) {
+        return next(new ErrorResponse(constants.MESSAGE.INVALID_CREDENTIALS, constants.STATUS_CODE.BAD_REQUEST));
+    }
+
+    // Check password:
+    const isMatched = await checkPassword(user.password, password);
+
+    // Check if password matched and if no return error for invalid credentials
+    if (!isMatched) {
+        return next(new ErrorResponse(constants.MESSAGE.INVALID_CREDENTIALS, constants.STATUS_CODE.BAD_REQUEST));
+    }
+
+    return res
+        .status(constants.STATUS_CODE.SUCCESS)
+        .json({ success: true, message: constants.MESSAGE.SUCCESS_LOGIN, data: [], token: user.getJWT });
+});
+
+export const logout = asyncMiddleware(async (req, res, next) => {
+    return res.status(constants.STATUS_CODE.REMOVED).json({ success: true, message: constants.MESSAGE.SUCCESS_LOGOUT, data: [] });
+});
+
+export const getProfile = asyncMiddleware(async (req, res, next) => {
+    // the user was already caught in the protect middleware, so no need to retrieve it again
+    const { id, username, email, role, avatar, friends, createdAt, updatedAt } = req.user;
+    return res
+        .status(constants.STATUS_CODE.SUCCESS)
+        .json({ success: true, message: constants.MESSAGE.PROFILE_RETRIEVED, data: { id, username, email, role, avatar, friends, createdAt, updatedAt } });
+});
+
+// TODO... If user is Admin it is not allow to add friends!!!
+export const updateProfile = asyncMiddleware(async (req, res, next) => {
+});
+
+export const deleteProfile = asyncMiddleware(async (req, res, next) => {
+});
+
+// TODO... If user is Admin it is not allow to add friends!!!
+export const getFriends = asyncMiddleware(async (req, res, next) => {
+});
+
+// TODO... If user is Admin it is not allow to add friends!!!
+export const addFriend = asyncMiddleware(async (req, res, next) => {
+});
+
+// TODO... If user is Admin it is not allow to add friends!!!
+export const removeFriend = asyncMiddleware(async (req, res, next) => {
+});

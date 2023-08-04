@@ -1,0 +1,28 @@
+export default {
+    STATUS_CODE: {
+        SUCCESS: 200,
+        CREATED: 201,
+        REMOVED: 204,
+        INTERNAL_SERVER_ERROR: 500,
+        BAD_REQUEST: 400,
+        NOT_AUTHORIZED: 401,
+        FORBIDDEN: 403,
+        SERVICE_UNAVAILABLE: 503
+    },
+    MESSAGE: {
+        SUCCESS_LOGIN: 'Successful Login',
+        SUCCESS_REGISTRATION: 'Successful Registration',
+        SUCCESS_LOGOUT: 'Successful Logout',
+        INVALID_CREDENTIALS: 'Invalid Credentials',
+        PROFILE_RETRIEVED: 'Own Profile Retrieved',
+        MODEL_NOT_SYNCED: 'Models are not synchronized!',
+        DB_DOWN: 'Database is down or it is not created!',
+        NOT_AUTHORIZED: 'Not authorized to access this route',
+        ONLY_FOR_ADMIN: 'Not authorized to access this route - only Admins are allowed',
+        ONLY_FOR_USERS: 'Not authorized to access this route - only Users are allowed',
+        INVALID_TOKEN: 'Invalid Token',
+        NO_ACCESS_TO_ROUTE: 'Not authorized to access this route',
+        FRIENDS_NOT_ALLOWED: 'The user you are trying to register is with role: admin. It is not allowed to add friends!'
+    }
+
+};
