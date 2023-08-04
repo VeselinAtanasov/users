@@ -14,6 +14,7 @@ export default {
         SUCCESS_LOGIN: 'Successful Login',
         SUCCESS_REGISTRATION: 'Successful Registration',
         SUCCESS_LOGOUT: 'Successful Logout',
+        ROUTE_NOT_FOUND: 'No route defined to this url',
         INVALID_CREDENTIALS: 'Invalid Credentials',
         PROFILE_RETRIEVED: 'Own Profile Retrieved',
         MODEL_NOT_SYNCED: 'Models are not synchronized!',
@@ -37,7 +38,9 @@ export default {
         MISSING_USER: 'The user does not exist in the database',
         USER_DELETED: 'Use deleted!',
         USER_RETRIEVED: 'User along with it`s friends is retrieved!',
-        USERS_RETRIEVED: 'Users retrieved!'
+        USERS_RETRIEVED: 'Users retrieved!',
+        USER_PASS_UPDATED: 'User password was updated by admin user',
+        TRIED_TO_UPDATE_MORE: 'Admin user tried to update more parameters except the password! Only password has been Updated!'
     }
 
 };

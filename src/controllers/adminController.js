@@ -2,6 +2,7 @@ import User from '../models/User.js';
 import asyncMiddleware from '../middleware/asyncMiddleware.js';
 import ErrorResponse from '../utils/ErrorResponse.js';
 import constants from '../constants/constants.js';
+import { createHashedPassword } from '../utils/bcrypt.js';
 import removeSensitiveInformation from '../utils/removeSensitiveInformation.js';
 
 export const createUser = asyncMiddleware(async (req, res, next) => {
@@ -75,5 +76,32 @@ export const getAllUsers = asyncMiddleware(async (req, res, next) => {
 });
 
 export const resetPassword = asyncMiddleware(async (req, res, next) => {
-    const {password, username} =req.body
+    const { password, username } = req.body;
+
+    // check if admin tries to update more params then password
+    const doesTryingToUpdateMoreSettings = Object.keys(req.body).filter((setting) => setting === 'password' & setting === 'username').length === 0;
+
+    // get user by username:
+    const user = await User.findOne({ where: { username } });
+
+    // if user is missing in db return error
+    if (!user) {
+        return next(new ErrorResponse(constants.MESSAGE.MISSING_USER, constants.STATUS_CODE.NOT_FOUND));
+    }
+
+    // hash the new password
+    user.password = await createHashedPassword(password);
+
+    // save the new password
+    await user.save();
+
+    // Define message response based on the admin request
+    let message = constants.MESSAGE.USER_PASS_UPDATED;
+    if (doesTryingToUpdateMoreSettings) {
+        message = constants.MESSAGE.TRIED_TO_UPDATE_MORE;
+    }
+
+    return res
+        .status(constants.STATUS_CODE.SUCCESS)
+        .json({ success: true, message, data: [] });
 });
