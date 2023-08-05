@@ -16,7 +16,7 @@ export const syncDb = async (req, resp, next) => {
 export const syncModels = async (req, res, next) => {
     try {
         // sync the database
-        await Token.sync();
+        //   await Token.sync();
         await sequelize.sync();
         console.log('Models synchronized successfully!');
         return next();

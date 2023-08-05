@@ -22,10 +22,15 @@ export const register = asyncMiddleware(async (req, res, next) => {
     // Create jwt token by invoking the virtual property on the user instance:
     const token = user.getJWT;
 
-    // store the token in the database
+    // set all options, used by the cookie
+    const options = {
+        expires: new Date(Date.now() + process.env.COOKIE_EXPIRATION_JWT * 24 * 60 * 60 * 1000),
+        httpOnly: true
+    };
 
     return res
         .status(constants.STATUS_CODE.CREATED)
+        .cookie('token', token, options)
         .json({ success: true, message: constants.MESSAGE.SUCCESS_REGISTRATION, data: removeSensitiveInformation(user), token });
 });
 
@@ -54,22 +59,35 @@ export const login = asyncMiddleware(async (req, res, next) => {
 
     const token = user.getJWT;
 
+    // set all options, used by the cookie
+    const options = {
+        expires: new Date(Date.now() + process.env.COOKIE_EXPIRATION_JWT * 24 * 60 * 60 * 1000),
+        httpOnly: true
+    };
+
     return res
         .status(constants.STATUS_CODE.SUCCESS)
+        .cookie('token', token, options)
         .json({ success: true, message: constants.MESSAGE.SUCCESS_LOGIN, data: removeSensitiveInformation(user), token });
 });
 
 export const logout = asyncMiddleware(async (req, res, next) => {
+    /* TODO...
     // will implement black list for all tokens after logout per userS
     const tokenManager = new TokenManager(req.user, req.token, req.decoded);
 
     // Add token in a black list
     await tokenManager.addTokenInUserBlackList();
-
-    // implement cookie parser and clear the cookie here // TODO...
+*/
+    // implement cookie parser and clear the cookie here //
+    const options = {
+        expires: new Date(Date.now() + 10 * 1000), // expires in 10sec
+        httpOnly: true
+    };
 
     return res
-        .status(constants.STATUS_CODE.REMOVED)
+        .status(constants.STATUS_CODE.SUCCESS)
+        .cookie('token', 'none', options)
         .json({ success: true, message: constants.MESSAGE.SUCCESS_LOGOUT, data: [] });
 });
 

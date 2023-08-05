@@ -31,14 +31,21 @@ export const userPermission = async (req, res, next) => {
 export const protect = async (req, res, next) => {
     let token;
 
+    /* TODO...
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         // get the token from the request!
         token = req.headers.authorization.split(' ')[1]; // set token from Bearer token in header
     }
+    */
+
+    // Get the token from the cookie - if it is missing force the user to login
+    if (req.cookies.token) { // set token from cookie
+        token = req.cookies.token;
+    }
 
     // Check if token exists
     if (!token) {
-        return next(new ErrorResponse(constants.MESSAGE.NOT_AUTHORIZED, constants.STATUS_CODE.NOT_AUTHORIZED));
+        return next(new ErrorResponse(constants.MESSAGE.NO_TOKEN, constants.STATUS_CODE.NOT_AUTHORIZED));
     }
 
     try {
@@ -49,6 +56,7 @@ export const protect = async (req, res, next) => {
 
         console.log('jwt decoded: ', decoded);
 
+        /* TODO...Remove
         // check if token is in black list if it is reject if not continue:
         const tokenManager = new TokenManager({ username }, token, decoded);
         const isInBlackList = await tokenManager.checkIfTokenIsInBlackList();
@@ -56,8 +64,9 @@ export const protect = async (req, res, next) => {
         if (isInBlackList) {
             return next(new ErrorResponse(constants.MESSAGE.TOKEN_IN_BLACK_LIST, constants.STATUS_CODE.NOT_AUTHORIZED));
         }
+        */
 
-        // TOken verification passed - get the user!
+        // Token verification passed - get the user!
         req.user = await User.findOne({ where: { id } });
         req.token = token;
         req.decoded = decoded;
@@ -68,6 +77,7 @@ export const protect = async (req, res, next) => {
 
         next();
     } catch (error) {
-        return next(new ErrorResponse(error.message, constants.STATUS_CODE.NOT_AUTHORIZED));
+        const message = constants.MESSAGE.INVALID_TOKEN + ' - ' + error.message;
+        return next(new ErrorResponse(message, constants.STATUS_CODE.NOT_AUTHORIZED));
     }
 };

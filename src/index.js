@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import fileUpload from 'express-fileupload';
+import cookieParser from 'cookie-parser';
 import constants from './constants/constants.js';
 import ErrorResponse from './utils/ErrorResponse.js';
 import userRouter from '../src/routers/userRouter.js';
@@ -18,6 +19,9 @@ app.use(syncDb);
 
 // middleware for synchronization the models
 app.use(syncModels);
+
+// middleware: cookie-parser
+app.use(cookieParser());
 
 // middleware: body parser :
 app.use(express.json());
