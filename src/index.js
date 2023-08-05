@@ -27,7 +27,9 @@ app.use(cookieParser());
 app.use(express.json());
 
 // add middleware for fileUpload:
-app.use(fileUpload());
+app.use(fileUpload({
+    limits: { fileSize: Number(process.env.AVATAR_SIZE) }
+}));
 
 // Mount the routers:
 app.use('/users/', userRouter);

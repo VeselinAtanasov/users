@@ -209,11 +209,11 @@ export const addAvatar = asyncMiddleware(async (req, res, next) => {
     if (!file.mimetype.endsWith('jpeg')) {
         return next(new ErrorResponse(constants.MESSAGE.WRONG_FILE_EXTENSION, constants.STATUS_CODE.BAD_REQUEST));
     }
-    // Check file size
-    if (file.size > process.env.AVATAR_SIZE) {
-        const message = constants.MESSAGE.IMAGE_SIZE + process.env.MAX_FILE_UPLOAD;
-        return next(new ErrorResponse(message, constants.STATUS_CODE.BAD_REQUEST));
-    }
+    // Check file size - no need of this - global limit is set in the express-fileUpload middleware
+    // if (file.size >= Number(process.env.AVATAR_SIZE)) {
+    //     const message = constants.MESSAGE.IMAGE_SIZE + process.env.MAX_FILE_UPLOAD;
+    //     return next(new ErrorResponse(message, constants.STATUS_CODE.BAD_REQUEST));
+    // }
 
     // Crate custom filename:
     file.name = `photo_${req.decoded.id}_${req.decoded.username}${path.parse(file.name).ext}`;
