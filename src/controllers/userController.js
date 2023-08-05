@@ -1,8 +1,10 @@
 import dotenv from 'dotenv';
+import path from 'path';
 
 import User from '../models/User.js';
 import asyncMiddleware from '../middleware/asyncMiddleware.js';
 import ErrorResponse from '../utils/ErrorResponse.js';
+import fileStorage from '../utils/fileStorage.js';
 import constants from '../constants/constants.js';
 import { checkPassword, createHashedPassword } from '../utils/bcrypt.js';
 import removeSensitiveInformation from '../utils/removeSensitiveInformation.js';
@@ -11,12 +13,10 @@ import removeSensitiveInformation from '../utils/removeSensitiveInformation.js';
 dotenv.config();
 
 export const register = asyncMiddleware(async (req, res, next) => {
-    const { username, email, password, role, avatar } = req.body;
-
-    // TODO:... cehck if avatar is passed - if yes uploaded it!
+    const { username, email, password, role } = req.body;
 
     // Create the user
-    const user = await User.create({ username, email, password, role, avatar });
+    const user = await User.create({ username, email, password, role });
 
     // Create jwt token by invoking the virtual property on the user instance:
     const token = user.getJWT;
@@ -111,8 +111,6 @@ export const updateProfile = asyncMiddleware(async (req, res, next) => {
         req.body.password = await createHashedPassword(req.body.password);
     }
 
-    // TODO if the request contains avatar to be uploaded - handle this!
-
     const updatedUser = await user.update(req.body);
 
     return res
@@ -143,6 +141,7 @@ export const addOwnFriend = asyncMiddleware(async (req, res, next) => {
         return next(new ErrorResponse(constants.MESSAGE.WRONG_INPUT, constants.STATUS_CODE.BAD_REQUEST));
     }
 
+    // If user is trying to add itself as a friend
     if (user.username === friendUserName) {
         return next(new ErrorResponse(constants.MESSAGE.WRONG_FRIEND, constants.STATUS_CODE.BAD_REQUEST));
     }
@@ -190,7 +189,40 @@ export const removeOwnFriend = asyncMiddleware(async (req, res, next) => {
         .json({ success: true, message: constants.MESSAGE.FRIEND_REMOVED, data: { removedFriend: friendUserName } });
 });
 
-// TODO: 
+// TODO:
 export const addAvatar = asyncMiddleware(async (req, res, next) => {
+    const user = req.user;
 
+    if (!req.files) {
+        return next(new ErrorResponse(constants.MESSAGE.UPLOAD_FILE, constants.STATUS_CODE.BAD_REQUEST));
+    }
+
+    const file = req.files.file;
+    console.log(req.files.file);
+
+    // check if image is a photo and return error if not:
+    if (!file.mimetype.startsWith('image')) {
+        return next(new ErrorResponse(constants.MESSAGE.UPLOAD_IMAGE, constants.STATUS_CODE.BAD_REQUEST));
+    }
+
+    // if file format is not jpeg, return an error
+    if (!file.mimetype.endsWith('jpeg')) {
+        return next(new ErrorResponse(constants.MESSAGE.WRONG_FILE_EXTENSION, constants.STATUS_CODE.BAD_REQUEST));
+    }
+    // Check file size
+    if (file.size > process.env.AVATAR_SIZE) {
+        const message = constants.MESSAGE.IMAGE_SIZE + process.env.MAX_FILE_UPLOAD;
+        return next(new ErrorResponse(message, constants.STATUS_CODE.BAD_REQUEST));
+    }
+
+    // Crate custom filename:
+    file.name = `photo_${req.decoded.id}_${req.decoded.username}${path.parse(file.name).ext}`;
+
+    await fileStorage(file, process.env.PATH_FOR_AVATARS);
+
+    await user.update({ avatar: file.name });
+
+    return res
+        .status(constants.STATUS_CODE.SUCCESS)
+        .json({ success: true, message: constants.MESSAGE.AVATAR_UPLOADED, data: {} });
 });

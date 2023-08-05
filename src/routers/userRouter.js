@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { register, login, logout, getProfile, updateProfile, getOwnFriends, addOwnFriend, removeOwnFriend } from '../controllers/userController.js';
+import { register, login, logout, getProfile, updateProfile, getOwnFriends, addOwnFriend, removeOwnFriend, addAvatar } from '../controllers/userController.js';
 import { protect, userPermission } from '../middleware/authorizationMiddlewares.js';
 
 const router = express.Router();
@@ -12,6 +12,8 @@ router.get('/logout', protect, logout);
 router.route('/profile')
     .get(protect, getProfile)
     .put(protect, updateProfile);
+
+router.route('/uploadPhoto').put(protect, addAvatar);
 
 // only role = user can have friends
 router.route('/friends')

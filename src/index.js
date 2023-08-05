@@ -6,8 +6,8 @@ import constants from './constants/constants.js';
 import ErrorResponse from './utils/ErrorResponse.js';
 import userRouter from '../src/routers/userRouter.js';
 import adminRouter from '../src/routers/adminRouter.js';
-import { syncDb, syncModels } from './middleware/databaseMiddlewares.js';
 import errorHandler from './middleware/errorHandlerMiddleware.js';
+import { syncDb, syncModels } from './middleware/databaseMiddlewares.js';
 
 dotenv.config();
 const PORT = process.env.PORT || 3000;
@@ -37,7 +37,7 @@ app.use('/admin/', adminRouter);
 // should be last in the app so will handle errors from controllers!
 
 // Define Route for all requests which do not match :
-app.all('*', (req, res) => res.status(constants.MESSAGE.ROUTE_NOT_FOUND).json(new ErrorResponse(constants.MESSAGE.ROUTE_NOT_FOUND, constants.STATUS_CODE.NOT_FOUND.code)));
+app.use('*', (req, res) => res.status(constants.STATUS_CODE.NOT_FOUND).json(new ErrorResponse(constants.MESSAGE.ROUTE_NOT_FOUND, constants.STATUS_CODE.NOT_FOUND)));
 
 app.use(errorHandler);
 

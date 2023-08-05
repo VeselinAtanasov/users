@@ -1,7 +1,9 @@
 import pkg from 'pg';
 import dbConfig from './dbConfig.js';
-
+import dotenv from 'dotenv';
 const { Client } = pkg;
+
+dotenv.config();
 
 const client = new Client({
     host: dbConfig.HOST,
@@ -13,7 +15,7 @@ const client = new Client({
 const createDatabase = async () => {
     try {
         await client.connect(); // gets connection
-        await client.query(`CREATE DATABASE ${dbConfig.DB}`); // sends queries
+        await client.query(`CREATE DATABASE ${process.env.DB}}`); // sends queries
         return true;
     } catch (error) {
         console.error(error.stack);
@@ -23,28 +25,6 @@ const createDatabase = async () => {
     }
 };
 
-export default createDatabase;
+const result = await createDatabase();
 
-// createDatabase().then((result) => {
-//     if (result) {
-//         console.log('Database created');
-//     }
-// });
-
-/*
-
-var pgtools = require('pgtools');
-pgtools.createdb({
-  user: 'postgres',
-  password: 'some pass',
-  port: 5432,
-  host: 'localhost'
-}, 'test-db', function (err, res) {
-  if (err) {
-    console.error(err);
-    process.exit(-1);
-  }
-  console.log(res);
-});
-
-*/
+console.log(result);
