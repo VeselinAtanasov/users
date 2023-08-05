@@ -28,7 +28,7 @@ export default {
         PROFILE_RETRIEVED: 'Own Profile Retrieved',
         MODEL_NOT_SYNCED: 'Models are not synchronized!',
         WRONG_INPUT: 'Wrong name of the inputs parameters',
-        DB_DOWN: 'Database is down or it is not created!',
+        DB_DOWN: 'Database is down or it is not created! Try to create it by executing form terminal `node createDb/dbSetup.js`',
         NOT_AUTHORIZED: 'Not authorized to access this route',
         NO_TOKEN: 'Your session has been expired. Please login again',
         PASSWORD_CHANGE_NOT_ALLOWED: 'User is not allowed to change the password.',

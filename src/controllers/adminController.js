@@ -6,10 +6,10 @@ import { createHashedPassword } from '../utils/bcrypt.js';
 import removeSensitiveInformation from '../utils/removeSensitiveInformation.js';
 
 export const createUser = asyncMiddleware(async (req, res, next) => {
-    const { username, email, password, role, avatar } = req.body;
+    const { username, email, password, role } = req.body;
 
     // Create the user
-    const user = await User.create({ username, email, password, role, avatar });
+    const user = await User.create({ username, email, password, role });
 
     // do not send the newly created user token!
     return res
