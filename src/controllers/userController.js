@@ -4,7 +4,7 @@ import path from 'path';
 import User from '../models/User.js';
 import asyncMiddleware from '../middleware/asyncMiddleware.js';
 import ErrorResponse from '../utils/ErrorResponse.js';
-import fileStorage from '../utils/fileStorage.js';
+import { saveFile } from '../utils/fileStorage.js';
 import constants from '../constants/constants.js';
 import { checkPassword, createHashedPassword } from '../utils/bcrypt.js';
 import removeSensitiveInformation from '../utils/removeSensitiveInformation.js';
@@ -223,7 +223,7 @@ export const addAvatar = asyncMiddleware(async (req, res, next) => {
     // Crate custom filename:
     file.name = `photo_${req.decoded.id}_${req.decoded.username}${path.parse(file.name).ext}`;
 
-    await fileStorage(file, process.env.PATH_FOR_AVATARS);
+    await saveFile(file, process.env.PATH_FOR_AVATARS);
 
     await user.update({ avatar: file.name });
 

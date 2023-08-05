@@ -3,6 +3,7 @@ import asyncMiddleware from '../middleware/asyncMiddleware.js';
 import ErrorResponse from '../utils/ErrorResponse.js';
 import constants from '../constants/constants.js';
 import { createHashedPassword } from '../utils/bcrypt.js';
+import { deleteFile } from '../utils/fileStorage.js';
 import removeSensitiveInformation from '../utils/removeSensitiveInformation.js';
 
 export const createUser = asyncMiddleware(async (req, res, next) => {
@@ -26,12 +27,26 @@ export const deleteUser = asyncMiddleware(async (req, res, next) => {
         return next(new ErrorResponse(constants.MESSAGE.MISSING_USER, constants.STATUS_CODE.NOT_FOUND));
     }
 
-    // remove the user form database
-    await user.destroy();
+    // before deleting the user remove it's avatar from storage if there is such!
 
-    return res
-        .status(constants.STATUS_CODE.SUCCESS)
-        .json({ success: true, message: constants.MESSAGE.USER_DELETED, data: {} });
+    if (user.avatar) {
+        try {
+            const pathToFile = `./public/avatars/${user.avatar}`;
+            await deleteFile(pathToFile);
+        } catch (error) {
+            console.log('File was not deleted!', error);
+            // Despite that file was not successfully deleted destroy the user in DB and return success response,
+            // as this will not affect the application and has no impact on user experience.
+            // here we may store the failed operation in log file and later to take care of deletion of all old avatars!
+        }
+
+        // remove the user form database
+        await user.destroy();
+
+        return res
+            .status(constants.STATUS_CODE.SUCCESS)
+            .json({ success: true, message: constants.MESSAGE.USER_DELETED, data: {} });
+    }
 });
 
 export const getOneUserById = asyncMiddleware(async (req, res, next) => {
