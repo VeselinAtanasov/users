@@ -158,6 +158,11 @@ export const addOwnFriend = asyncMiddleware(async (req, res, next) => {
     // get friend profile from database
     const friendProfile = await User.findOne({ where: { username: friendUserName } });
 
+    if (!friendProfile) {
+        return next(new ErrorResponse(constants.MESSAGE.FRIEND_NOT_EXISTS, constants.STATUS_CODE.BAD_REQUEST));
+
+    }
+
     // add friend
     await user.addFriend(friendProfile);
 

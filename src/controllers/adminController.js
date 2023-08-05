@@ -6,7 +6,6 @@ import { createHashedPassword } from '../utils/bcrypt.js';
 import removeSensitiveInformation from '../utils/removeSensitiveInformation.js';
 
 export const createUser = asyncMiddleware(async (req, res, next) => {
-    console.log(req.user.toJSON());
     const { username, email, password, role, avatar } = req.body;
 
     // Create the user
@@ -42,7 +41,6 @@ export const getOneUserById = asyncMiddleware(async (req, res, next) => {
 
     // get user along with all it's friends
     const user = await User.findOne({ where: { id }, include: { model: User, as: 'friends' } });
-    console.log(user.toJSON());
 
     // If user is missing return error
     if (!user) {

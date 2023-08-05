@@ -35,6 +35,7 @@ export default {
         FRIEND_ADDED: 'Friend has been added!',
         FRIENDS_LIMIT_REACHED: 'Maximum number of friends in own list is reached!',
         WRONG_FRIEND: 'You are trying to add yourself as friend!',
+        FRIEND_NOT_EXISTS: 'The friend you are trying to add does not exists',
         FRIEND_REMOVED: 'You just removed a friend from your list',
         USER_CREATED_BY_ADMIN: 'User successfully created!',
         MISSING_USER: 'The user does not exist in the database',
