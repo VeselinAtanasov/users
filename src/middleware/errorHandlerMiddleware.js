@@ -8,9 +8,6 @@ export default (err, req, res, next) => {
     let error = { ...err };
     error.message = err.message;
 
-    console.log('=== Error From ErrorHandler: ', err);
-    console.log('=== Error NAME: ' + err.name);
-
     // Postgres error for duplicate value
     if (err.name === 'SequelizeUniqueConstraintError') {
         const message = Object.values(err.errors).map((e) => e.message);
@@ -24,16 +21,16 @@ export default (err, req, res, next) => {
     }
 
     if (err.name === 'SequelizeConnectionError') {
-        error = new ErrorResponse('Connection Error. Service Unavailable', 400);
+        error = new ErrorResponse(constants.MESSAGE.CONNECTION_ERROR, 400);
     }
 
     if (err.name === 'TypeError') {
-        error = new ErrorResponse('TypeError', 500);
+        error = new ErrorResponse(constants.MESSAGE.TYPE_ERROR, 500);
     }
 
     res.status(error.statusCode || 500).json({
         success: false,
-        error: error.message || 'Server Error',
-        e: err
+        error: error.message || constants.MESSAGE.INTERNAL_SERVER_ERROR
+        // e: err
     });
 };

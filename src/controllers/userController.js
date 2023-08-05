@@ -160,7 +160,6 @@ export const addOwnFriend = asyncMiddleware(async (req, res, next) => {
 
     if (!friendProfile) {
         return next(new ErrorResponse(constants.MESSAGE.FRIEND_NOT_EXISTS, constants.STATUS_CODE.BAD_REQUEST));
-
     }
 
     // add friend
@@ -191,6 +190,7 @@ export const removeOwnFriend = asyncMiddleware(async (req, res, next) => {
         .json({ success: true, message: constants.MESSAGE.FRIEND_REMOVED, data: { removedFriend: friendUserName } });
 });
 
+// TODO: 
 export const addAvatar = asyncMiddleware(async (req, res, next) => {
 
 });
