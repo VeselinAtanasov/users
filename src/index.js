@@ -35,12 +35,11 @@ app.use(fileUpload({
 app.use('/users/', userRouter);
 app.use('/admin/', adminRouter);
 
-// use customer error handler, which will handle all uncaught errors .
-// should be last in the app so will handle errors from controllers!
-
 // Define Route for all requests which do not match :
 app.use('*', (req, res) => res.status(constants.STATUS_CODE.NOT_FOUND).json(new ErrorResponse(constants.MESSAGE.ROUTE_NOT_FOUND, constants.STATUS_CODE.NOT_FOUND)));
 
+// use customer error handler, which will handle all uncaught errors .
+// should be last in the app so will handle errors from controllers!
 app.use(errorHandler);
 
 app.listen(PORT, () => console.log(`Server is working and is listening on port: ${PORT}`));

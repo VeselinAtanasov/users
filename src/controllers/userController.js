@@ -111,6 +111,11 @@ export const updateProfile = asyncMiddleware(async (req, res, next) => {
         req.body.password = await createHashedPassword(req.body.password);
     }
 
+    // do not allow the user to modify avatar fro update profile
+    if (req.body.avatar) {
+        delete req.body.avatar;
+    }
+
     const updatedUser = await user.update(req.body);
 
     return res
