@@ -6,7 +6,6 @@ import ErrorResponse from '../utils/ErrorResponse.js';
 import constants from '../constants/constants.js';
 import { checkPassword, createHashedPassword } from '../utils/bcrypt.js';
 import removeSensitiveInformation from '../utils/removeSensitiveInformation.js';
-import TokenManager from '../utils/TokenManager.js';
 
 // load process config
 dotenv.config();
@@ -72,13 +71,6 @@ export const login = asyncMiddleware(async (req, res, next) => {
 });
 
 export const logout = asyncMiddleware(async (req, res, next) => {
-    /* TODO...
-    // will implement black list for all tokens after logout per userS
-    const tokenManager = new TokenManager(req.user, req.token, req.decoded);
-
-    // Add token in a black list
-    await tokenManager.addTokenInUserBlackList();
-*/
     // implement cookie parser and clear the cookie here //
     const options = {
         expires: new Date(Date.now() + 10 * 1000), // expires in 10sec
