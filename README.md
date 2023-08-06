@@ -12,13 +12,13 @@ The application is split into two parts
     * Once the user is registered/logged in a JWT token is returned from the server.
     * Using this token the user can :
 		* Edit its own account, but it is not allowed to change the username and the role from user to admin 
-		* Retrieve it's own account, along with all friends, if there are any.
-		* Retrieve a list if all friends(only users with role = user are allowed).
-		* Add a friend in it's friend list(only users with role = user are allowed).
-		* Remove a friend from it's friend list(only users with role = user are allowed).
-		* Add an image to the profile..
+		* Retrieve its own account, along with all friends, if there are any.
+		* Retrieve a list of all friends(only users with role = user are allowed).
+		* Add a friend in its friend list(only users with role = user are allowed).
+		* Remove a friend from its friend list(only users with role = user are allowed).
+		* Add an image to the profile.
 * Admin functionality:
-    * Admins are normal user and has access to all user functionality, except friends list functionality
+    * Admins are normal user and has access to all user functionality, except friends list feature
     * Admins can:
 		* Retrieve all users with pagination
 		* Retrieve a single user by id
@@ -26,5 +26,5 @@ The application is split into two parts
 		* Create new user
 		* Delete user
 ## Additional information:
-* Postman collection in provided in the repo, so anyone can test the API functionality
-* Once the API is started, but the database is not created yet an error like: **Database is down or it is not created! Try to create it by executing form terminal `node createDb/dbSetup.js` ** will be returned. So the API user can create this database by executing the command form the response.
+* Postman collection is provided in the repo, so anyone can test the API functionality
+* Once the API is started and the database is not created yet, an error like: "Database is down or it is not created! Try to create it by executing form terminal `node createDb/dbSetup.js`" will be returned. So the API user can create this database by executing the command form the response.
