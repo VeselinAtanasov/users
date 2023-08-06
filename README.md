@@ -28,3 +28,5 @@ The application is split into two parts
 ## Additional information:
 * Postman collection is provided in the repo, so anyone can test the API functionality
 * Once the API is started and the database is not created yet, an error like: "Database is down or it is not created! Try to create it by executing form terminal `node createDb/dbSetup.js`" will be returned. So the API user can create this database by executing the command form the response.
+* By default the app uses cookies to send the token to the user. On logout the cookie is set to expired and thus no attempts are allowed and user is forced to login again
+* The application supports also, authorization without cookie, i.e. the server checks the authorization headers in the request and token is extracted from there. In this case, a black list table in the database with tokens per user is supported. In order to allow this functionality a process.env param called USE_TOKEN_FROM should not be set as `cookie`
