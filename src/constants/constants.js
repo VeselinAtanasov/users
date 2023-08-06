@@ -53,7 +53,7 @@ export default {
         USER_RETRIEVED: 'User along with it`s friends is retrieved!',
         USERS_RETRIEVED: 'Users retrieved!',
         USER_PASS_UPDATED: 'User password was updated by admin user',
-        TRIED_TO_UPDATE_MORE: 'Admin user tried to update more parameters except the password! Only password has been Updated!'
+        TRIED_TO_UPDATE_MORE: 'Admin tried to update more parameters then the password! Only password has been Updated!'
     }
 
 };

@@ -91,7 +91,7 @@ export const resetPassword = asyncMiddleware(async (req, res, next) => {
     const { password, username } = req.body;
 
     // check if admin tries to update more params then password
-    const doesTryingToUpdateMoreSettings = Object.keys(req.body).filter((setting) => setting === 'password' & setting === 'username').length === 0;
+    const doesTryingToUpdateMoreSettings = Object.keys(req.body).filter((setting) => setting !== 'password' & setting !== 'username').length !== 0;
 
     // get user by username:
     const user = await User.findOne({ where: { username } });

@@ -1,6 +1,10 @@
+import dotenv from 'dotenv';
 import { testDbConnection, sequelize } from '../configs/db.js';
 import ErrorResponse from '../utils/ErrorResponse.js';
 import constants from '../constants/constants.js';
+import Token from '../models/Token.js';
+
+dotenv.config();
 
 export const syncDb = async (req, resp, next) => {
     try {
@@ -15,6 +19,12 @@ export const syncDb = async (req, resp, next) => {
 export const syncModels = async (req, res, next) => {
     try {
         // sync the database
+
+        // if token is retrieved from authorization header- load the Token Model
+        if (process.env.USE_TOKEN_FROM !== 'cookie') {
+            await Token.sync();
+        }
+
         await sequelize.sync();
         console.log('Models synchronized successfully!');
         return next();
