@@ -228,7 +228,7 @@ export const addAvatar = asyncMiddleware(async (req, res, next) => {
     // Crate custom filename:
     file.name = `photo_${req.decoded.id}_${req.decoded.username}${path.parse(file.name).ext}`;
 
-    await saveFile(file, process.env.PATH_FOR_AVATARS);
+    await saveFile(user, file, process.env.PATH_FOR_AVATARS);
 
     await user.update({ avatar: file.name });
 

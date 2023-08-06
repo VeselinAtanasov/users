@@ -17,6 +17,7 @@ export default {
         ROUTE_NOT_FOUND: 'No route defined to this url',
         UPLOAD_FILE: 'Please upload file!',
         ERROR_STORING_FILE: 'Error while trying to store a file on a file system!',
+        ERROR_STORING_FILE_CREATE_DIR: 'Error while trying to store a file on a file system! Please try again later!',
         UPLOAD_IMAGE: 'Please upload a image file in correct format',
         IMAGE_SIZE: 'Please upload a image with size less then: ',
         WRONG_FILE_EXTENSION: 'Please upload a image with .jpg extension!',

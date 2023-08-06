@@ -31,8 +31,7 @@ export const deleteUser = asyncMiddleware(async (req, res, next) => {
 
     if (user.avatar) {
         try {
-            const pathToFile = `./public/avatars/${user.avatar}`;
-            await deleteFile(pathToFile);
+            await deleteFile(user, process.env.PATH_FOR_AVATARS);
         } catch (error) {
             console.log('File was not deleted!', error);
             // Despite that file was not successfully deleted destroy the user in DB and return success response,
