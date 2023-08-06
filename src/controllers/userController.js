@@ -106,6 +106,11 @@ export const updateProfile = asyncMiddleware(async (req, res, next) => {
         return next(new ErrorResponse(constants.MESSAGE.ROLE_CHANGE_NOT_ALLOWED, constants.STATUS_CODE.BAD_REQUEST));
     }
 
+    // do not allow the user to change it's username:
+    if (req.body.username) {
+        return next(new ErrorResponse(constants.MESSAGE.PASSWORD_CHANGE_NOT_ALLOWED, constants.STATUS_CODE.BAD_REQUEST));
+    }
+
     // Each user can change his own password, but only admin can change other users password
     if (req.body.password) {
         req.body.password = await createHashedPassword(req.body.password);
