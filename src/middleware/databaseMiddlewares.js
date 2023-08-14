@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { testDbConnection, sequelize } from '../configs/db.js';
+import { testDbConnection, sequelize } from '../db/database.js';
 import ErrorResponse from '../utils/ErrorResponse.js';
 import constants from '../constants/constants.js';
 import Token from '../models/Token.js';

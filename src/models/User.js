@@ -1,5 +1,5 @@
 // example.js
-import { sequelize } from '../configs/db.js';
+import { sequelize } from '../db/database.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { DataTypes } from 'sequelize';
