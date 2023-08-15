@@ -48,6 +48,13 @@ class TokenManager {
         }
         return false;
     }
+
+    async removeTokensFromBlackList(user) {
+        // delete all tokens by user
+
+        // TODO...
+        return await true;
+    }
 };
 
 export default TokenManager;

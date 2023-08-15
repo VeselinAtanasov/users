@@ -2,12 +2,12 @@ import dotenv from 'dotenv';
 import path from 'path';
 
 import UserService from '../services/UserService.js';
+import AuthenticationService from '../services/AuthenticationService.js';
 import asyncMiddleware from '../middleware/asyncMiddleware.js';
 import ErrorResponse from '../utils/ErrorResponse.js';
 import FileStorageService from '../services/FileStorageService.js';
 import TokenService from '../services/TokenService.js';
 import constants from '../constants/constants.js';
-import { checkPassword, createHashedPassword } from '../utils/bcrypt.js';
 import removeSensitiveInformation from '../utils/removeSensitiveInformation.js';
 
 // load process config
@@ -28,6 +28,13 @@ export const register = asyncMiddleware(async (req, res, next) => {
         httpOnly: true
     };
 
+    if (process.env.USE_TOKEN_FROM !== 'cookie') {
+        // will delete all existing token form blackList
+        const tokenService = new TokenService(user, token, null);
+        // remove all existing tokens from user token BL
+        await tokenService.removeTokensFromBlackList();
+    }
+
     return res
         .status(constants.STATUS_CODE.CREATED)
         .cookie('token', token, options)
@@ -37,6 +44,7 @@ export const register = asyncMiddleware(async (req, res, next) => {
 export const login = asyncMiddleware(async (req, res, next) => {
     const { username, password } = req.body;
     const userService = new UserService();
+    const authService = new AuthenticationService();
 
     // Check for valid input and return error if true
     if (!username || !password) {
@@ -51,7 +59,7 @@ export const login = asyncMiddleware(async (req, res, next) => {
     }
 
     // Check password:
-    const isMatched = await checkPassword(user.password, password);
+    const isMatched = await authService.checkPassword(user.password, password);
 
     // Check if password matched and if no return error for invalid credentials
     if (!isMatched) {
@@ -65,6 +73,13 @@ export const login = asyncMiddleware(async (req, res, next) => {
         expires: new Date(Date.now() + process.env.COOKIE_EXPIRATION_JWT * 24 * 60 * 60 * 1000),
         httpOnly: true
     };
+
+    if (process.env.USE_TOKEN_FROM !== 'cookie') {
+        // will delete all existing token form blackList
+        const tokenService = new TokenService(user, token, null);
+        // remove all existing tokens from user token BL
+        await tokenService.removeTokensFromBlackList();
+    }
 
     return res
         .status(constants.STATUS_CODE.SUCCESS)
@@ -112,6 +127,7 @@ export const getProfile = asyncMiddleware(async (req, res, next) => {
 export const updateProfile = asyncMiddleware(async (req, res, next) => {
     const user = req.user;
     const userService = new UserService();
+    const authService = new AuthenticationService();
 
     // not allowed to change your role if you are not an admin
     if (req.user.role === 'user' && req.body.role) {
@@ -125,7 +141,7 @@ export const updateProfile = asyncMiddleware(async (req, res, next) => {
 
     // Each user can change his own password, but only admin can change other users password
     if (req.body.password) {
-        req.body.password = await createHashedPassword(req.body.password);
+        req.body.password = await authService.createHashedPassword(req.body.password);
     }
 
     // do not allow the user to modify avatar fro update profile
