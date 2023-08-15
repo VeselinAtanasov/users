@@ -1,4 +1,4 @@
-import User from '../models/User';
+import User from '../models/User.js';
 
 class UserService {
     async createUser(username, email, password, role) {

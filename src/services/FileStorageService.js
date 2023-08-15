@@ -1,6 +1,6 @@
 import fs from 'fs';
 import constants from '../constants/constants.js';
-import ErrorResponse from './ErrorResponse.js';
+import ErrorResponse from '../utils/ErrorResponse.js';
 
 class FileStorageService {
     constructor(user) {

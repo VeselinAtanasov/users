@@ -44,11 +44,10 @@ export const deleteUser = asyncMiddleware(async (req, res, next) => {
 
         // remove the user form database
         await userService.deleteUser(user);
-
-        return res
-            .status(constants.STATUS_CODE.SUCCESS)
-            .json({ success: true, message: constants.MESSAGE.USER_DELETED, data: {} });
     }
+    return res
+        .status(constants.STATUS_CODE.SUCCESS)
+        .json({ success: true, message: constants.MESSAGE.USER_DELETED, data: {} });
 });
 
 export const getOneUserById = asyncMiddleware(async (req, res, next) => {
