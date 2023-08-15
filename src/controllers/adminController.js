@@ -1,9 +1,9 @@
 import UserService from '../services/UserService.js';
+import FileStorageService from '../services/FileStorageService.js';
 import asyncMiddleware from '../middleware/asyncMiddleware.js';
 import ErrorResponse from '../utils/ErrorResponse.js';
 import constants from '../constants/constants.js';
 import { createHashedPassword } from '../utils/bcrypt.js';
-import { deleteFile } from '../utils/fileStorage.js';
 import removeSensitiveInformation from '../utils/removeSensitiveInformation.js';
 
 export const createUser = asyncMiddleware(async (req, res, next) => {
@@ -11,7 +11,7 @@ export const createUser = asyncMiddleware(async (req, res, next) => {
     const userService = new UserService();
 
     // Create the user
-    const user = userService.createUser(username, email, password, role);
+    const user = await userService.createUser(username, email, password, role);
 
     // do not send the newly created user token!
     return res
@@ -23,7 +23,8 @@ export const deleteUser = asyncMiddleware(async (req, res, next) => {
     const id = req.params.id;
     const userService = new UserService();
 
-    const user = userService.findUserByPk(id);
+    const user = await userService.findUserByPk(id);
+    const storageService = new FileStorageService(user);
 
     if (!user) {
         return next(new ErrorResponse(constants.MESSAGE.MISSING_USER, constants.STATUS_CODE.NOT_FOUND));
@@ -33,7 +34,7 @@ export const deleteUser = asyncMiddleware(async (req, res, next) => {
 
     if (user.avatar) {
         try {
-            await deleteFile(user, process.env.PATH_FOR_AVATARS);
+            await storageService.deleteFile(process.env.PATH_FOR_AVATARS);
         } catch (error) {
             console.log('File was not deleted!', error);
             // Despite that file was not successfully deleted destroy the user in DB and return success response,
@@ -42,7 +43,7 @@ export const deleteUser = asyncMiddleware(async (req, res, next) => {
         }
 
         // remove the user form database
-        userService.deleteUser(user);
+        await userService.deleteUser(user);
 
         return res
             .status(constants.STATUS_CODE.SUCCESS)
@@ -96,7 +97,7 @@ export const resetPassword = asyncMiddleware(async (req, res, next) => {
     const doesTryingToUpdateMoreSettings = Object.keys(req.body).filter((setting) => setting !== 'password' & setting !== 'username').length !== 0;
 
     // get user by username:
-    const user = userService.findUserByUserName(username);
+    const user = await userService.findUserByUserName(username);
 
     // if user is missing in db return error
     if (!user) {

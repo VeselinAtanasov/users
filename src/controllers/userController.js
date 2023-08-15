@@ -4,7 +4,7 @@ import path from 'path';
 import UserService from '../services/UserService.js';
 import asyncMiddleware from '../middleware/asyncMiddleware.js';
 import ErrorResponse from '../utils/ErrorResponse.js';
-import { saveFile } from '../utils/fileStorage.js';
+import FileStorageService from '../services/FileStorageService.js';
 import TokenManager from '../utils/TokenManager.js';
 import constants from '../constants/constants.js';
 import { checkPassword, createHashedPassword } from '../utils/bcrypt.js';
@@ -99,7 +99,7 @@ export const getProfile = asyncMiddleware(async (req, res, next) => {
     const userService = new UserService();
 
     // fetch friends as well and return them:
-    const friends = userService.getAllFriends(user);
+    const friends = await userService.getAllFriends(user);
 
     const response = removeSensitiveInformation(user);
     response.friends = friends.map((friend) => removeSensitiveInformation(friend));
@@ -133,7 +133,7 @@ export const updateProfile = asyncMiddleware(async (req, res, next) => {
         delete req.body.avatar;
     }
 
-    const updatedUser = userService.updateUser(user, req.body);
+    const updatedUser = await userService.updateUser(user, req.body);
 
     return res
         .status(constants.STATUS_CODE.SUCCESS)
@@ -171,7 +171,7 @@ export const addOwnFriend = asyncMiddleware(async (req, res, next) => {
     }
 
     // get total number of friends in the list:
-    const numberOfFriends = userService.countFriends(user);
+    const numberOfFriends = await userService.countFriends(user);
 
     // check if maximum number of friends is reached
     if (numberOfFriends > process.env.MAXIMUM_NUMBER_OF_FRIENDS_IN_LIST) {
@@ -217,6 +217,7 @@ export const removeOwnFriend = asyncMiddleware(async (req, res, next) => {
 export const addAvatar = asyncMiddleware(async (req, res, next) => {
     const user = req.user;
     const userService = new UserService();
+    const storageService = new FileStorageService(user);
 
     if (!req.files) {
         return next(new ErrorResponse(constants.MESSAGE.UPLOAD_FILE, constants.STATUS_CODE.BAD_REQUEST));
@@ -243,7 +244,7 @@ export const addAvatar = asyncMiddleware(async (req, res, next) => {
     // Crate custom filename:
     file.name = `photo_${req.decoded.id}_${req.decoded.username}${path.parse(file.name).ext}`;
 
-    await saveFile(user, file, process.env.PATH_FOR_AVATARS);
+    await storageService.saveFile(file, process.env.PATH_FOR_AVATARS);
 
     await userService.updateUser(user, { avatar: file.name });
 
