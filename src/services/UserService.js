@@ -29,7 +29,7 @@ class UserService {
         return await user.countFriends();
     }
 
-    async getUserByPk(id) {
+    async findUserByPk(id) {
         return await User.findByPk(id);
     }
 
@@ -39,6 +39,17 @@ class UserService {
 
     async getUserAndFriends(id) {
         return await User.findOne({ where: { id }, include: { model: User, as: 'friends' } });
+    }
+
+    async findAllUsersAndCount(pageSize, page) {
+        return await User.findAndCountAll({
+            limit: pageSize,
+            offset: page * pageSize
+        });
+    }
+
+    async saveUser(user) {
+        return await user.save();
     }
 }
 
