@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import path from 'path';
 
-import User from '../models/User.js';
+import UserService from '../services/UserService.js';
 import asyncMiddleware from '../middleware/asyncMiddleware.js';
 import ErrorResponse from '../utils/ErrorResponse.js';
 import { saveFile } from '../utils/fileStorage.js';
@@ -15,9 +15,9 @@ dotenv.config();
 
 export const register = asyncMiddleware(async (req, res, next) => {
     const { username, email, password, role } = req.body;
-
+    const userService = new UserService();
     // Create the user
-    const user = await User.create({ username, email, password, role });
+    const user = await userService.createUser(username, email, password, role);
 
     // Create jwt token by invoking the virtual property on the user instance:
     const token = user.getJWT;
@@ -36,13 +36,14 @@ export const register = asyncMiddleware(async (req, res, next) => {
 
 export const login = asyncMiddleware(async (req, res, next) => {
     const { username, password } = req.body;
+    const userService = new UserService();
 
     // Check for valid input and return error if true
     if (!username || !password) {
         return next(new ErrorResponse(constants.MESSAGE.INVALID_CREDENTIALS, constants.STATUS_CODE.BAD_REQUEST));
     }
 
-    const user = await User.findOne({ where: { username } });
+    const user = await userService.findUserByUserName(username);
 
     // Check is user exists and return error for invalid credentials
     if (!user) {
@@ -95,9 +96,10 @@ export const logout = asyncMiddleware(async (req, res, next) => {
 export const getProfile = asyncMiddleware(async (req, res, next) => {
     // the user was already caught in the protect middleware, but we need to fetch also the friends
     const user = req.user;
+    const userService = new UserService();
 
     // fetch friends as well and return them:
-    const friends = await user.getFriends();
+    const friends = userService.getAllFriends(user);
 
     const response = removeSensitiveInformation(user);
     response.friends = friends.map((friend) => removeSensitiveInformation(friend));
@@ -109,6 +111,7 @@ export const getProfile = asyncMiddleware(async (req, res, next) => {
 
 export const updateProfile = asyncMiddleware(async (req, res, next) => {
     const user = req.user;
+    const userService = new UserService();
 
     // not allowed to change your role if you are not an admin
     if (req.user.role === 'user' && req.body.role) {
@@ -130,7 +133,7 @@ export const updateProfile = asyncMiddleware(async (req, res, next) => {
         delete req.body.avatar;
     }
 
-    const updatedUser = await user.update(req.body);
+    const updatedUser = userService.updateUser(user, req.body);
 
     return res
         .status(constants.STATUS_CODE.SUCCESS)
@@ -139,9 +142,10 @@ export const updateProfile = asyncMiddleware(async (req, res, next) => {
 
 export const getOwnFriends = asyncMiddleware(async (req, res, next) => {
     const user = req.user;
+    const userService = new UserService();
 
     // get all user friends:
-    const friends = await user.getFriends();
+    const friends = await userService.getAllFriends(user);
 
     // send in the response only the usernames
     const filteredFriends = friends.map((friend) => friend.username);
@@ -154,6 +158,7 @@ export const getOwnFriends = asyncMiddleware(async (req, res, next) => {
 export const addOwnFriend = asyncMiddleware(async (req, res, next) => {
     const user = req.user;
     const { friendUserName } = req.body;
+    const userService = new UserService();
 
     // if the input is wrong!
     if (!friendUserName) {
@@ -166,7 +171,7 @@ export const addOwnFriend = asyncMiddleware(async (req, res, next) => {
     }
 
     // get total number of friends in the list:
-    const numberOfFriends = await user.countFriends();
+    const numberOfFriends = userService.countFriends(user);
 
     // check if maximum number of friends is reached
     if (numberOfFriends > process.env.MAXIMUM_NUMBER_OF_FRIENDS_IN_LIST) {
@@ -174,14 +179,14 @@ export const addOwnFriend = asyncMiddleware(async (req, res, next) => {
     }
 
     // get friend profile from database
-    const friendProfile = await User.findOne({ where: { username: friendUserName } });
+    const friendProfile = await userService.findUserByUserName(friendUserName);
 
     if (!friendProfile) {
         return next(new ErrorResponse(constants.MESSAGE.FRIEND_NOT_EXISTS, constants.STATUS_CODE.BAD_REQUEST));
     }
 
     // add friend
-    await user.addFriend(friendProfile);
+    await userService.addFriend(user, friendProfile);
 
     return res
         .status(constants.STATUS_CODE.SUCCESS)
@@ -191,6 +196,7 @@ export const addOwnFriend = asyncMiddleware(async (req, res, next) => {
 export const removeOwnFriend = asyncMiddleware(async (req, res, next) => {
     const user = req.user;
     const { friendUserName } = req.body;
+    const userService = new UserService();
 
     // if the input is wrong!
     if (!friendUserName) {
@@ -198,10 +204,10 @@ export const removeOwnFriend = asyncMiddleware(async (req, res, next) => {
     }
 
     // get the friend from database
-    const friendProfile = await User.findOne({ where: { username: friendUserName } });
+    const friendProfile = await userService.findUserByUserName(friendUserName);
 
     // remove the friend
-    await user.removeFriend(friendProfile);
+    await userService.removeFriend(user, friendProfile);
 
     return res
         .status(constants.STATUS_CODE.SUCCESS)
@@ -210,6 +216,7 @@ export const removeOwnFriend = asyncMiddleware(async (req, res, next) => {
 
 export const addAvatar = asyncMiddleware(async (req, res, next) => {
     const user = req.user;
+    const userService = new UserService();
 
     if (!req.files) {
         return next(new ErrorResponse(constants.MESSAGE.UPLOAD_FILE, constants.STATUS_CODE.BAD_REQUEST));
@@ -238,7 +245,7 @@ export const addAvatar = asyncMiddleware(async (req, res, next) => {
 
     await saveFile(user, file, process.env.PATH_FOR_AVATARS);
 
-    await user.update({ avatar: file.name });
+    await userService.updateUser(user, { avatar: file.name });
 
     return res
         .status(constants.STATUS_CODE.SUCCESS)
