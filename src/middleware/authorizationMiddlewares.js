@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import ErrorResponse from '../utils/ErrorResponse.js';
-import TokenManager from '../utils/TokenManager.js';
+import TokenService from '../services/TokenService.js';
 import constants from '../constants/constants.js';
 import User from '../models/User.js';
 
@@ -69,8 +69,8 @@ export const protect = async (req, res, next) => {
         // if token is retrieved from authorization header
         if (process.env.USE_TOKEN_FROM !== 'cookie') {
             // check if token is in black list if it is reject if not continue:
-            const tokenManager = new TokenManager({ username }, token, decoded);
-            const isInBlackList = await tokenManager.checkIfTokenIsInBlackList();
+            const tokenService = new TokenService({ username }, token, decoded);
+            const isInBlackList = await tokenService.checkIfTokenIsInBlackList();
 
             if (isInBlackList) {
                 return next(new ErrorResponse(constants.MESSAGE.TOKEN_IN_BLACK_LIST, constants.STATUS_CODE.NOT_AUTHORIZED));

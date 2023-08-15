@@ -5,7 +5,7 @@ import UserService from '../services/UserService.js';
 import asyncMiddleware from '../middleware/asyncMiddleware.js';
 import ErrorResponse from '../utils/ErrorResponse.js';
 import FileStorageService from '../services/FileStorageService.js';
-import TokenManager from '../utils/TokenManager.js';
+import TokenService from '../services/TokenService.js';
 import constants from '../constants/constants.js';
 import { checkPassword, createHashedPassword } from '../utils/bcrypt.js';
 import removeSensitiveInformation from '../utils/removeSensitiveInformation.js';
@@ -76,9 +76,9 @@ export const logout = asyncMiddleware(async (req, res, next) => {
     // if token is retrieved form authorization header then add the token ina  black list:
     if (process.env.USE_TOKEN_FROM !== 'cookie') {
         // will implement black list for all tokens after logout per userS
-        const tokenManager = new TokenManager(req.user, req.token, req.decoded);
+        const tokenService = new TokenService(req.user, req.token, req.decoded);
         // Add token in a black list
-        await tokenManager.addTokenInUserBlackList();
+        await tokenService.addTokenInUserBlackList();
     }
 
     // implement cookie parser and clear the cookie here //
