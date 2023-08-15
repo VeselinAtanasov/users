@@ -82,4 +82,9 @@ User.beforeCreate(async (user, options) => {
 // create association many-to-many, with friends alias. It should be placed here, so it would be created once
 User.belongsToMany(User, { as: 'friends', through: 'user_friend' });
 
+// Class Method
+User.transaction = async () => {
+    return await sequelize.transaction();
+};
+
 export default User;

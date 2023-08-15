@@ -14,10 +14,16 @@ import removeSensitiveInformation from '../utils/removeSensitiveInformation.js';
 dotenv.config();
 
 export const register = asyncMiddleware(async (req, res, next) => {
-    const { username, email, password, role } = req.body;
+    const { username, email, password, role, friends } = req.body;
     const userService = new UserService();
     // Create the user
-    const user = await userService.createUser(username, email, password, role);
+    let user;
+    if (friends) {
+        user = await userService.createUserAndFriends(req.body);
+        console.log(user);
+    } else {
+        user = await userService.createUser(username, email, password, role);
+    }
 
     // Create jwt token by invoking the virtual property on the user instance:
     const token = user.getJWT;

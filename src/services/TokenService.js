@@ -1,6 +1,4 @@
 import Token from '../models/Token.js';
-import User from '../models/User.js';
-import UserService from '../services/UserService.js';
 
 class TokenService {
     constructor(user, token, decoded) {
