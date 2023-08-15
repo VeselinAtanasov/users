@@ -28,13 +28,6 @@ export const register = asyncMiddleware(async (req, res, next) => {
         httpOnly: true
     };
 
-    if (process.env.USE_TOKEN_FROM !== 'cookie') {
-        // will delete all existing token form blackList
-        const tokenService = new TokenService(user, token, null);
-        // remove all existing tokens from user token BL
-        await tokenService.removeTokensFromBlackList();
-    }
-
     return res
         .status(constants.STATUS_CODE.CREATED)
         .cookie('token', token, options)

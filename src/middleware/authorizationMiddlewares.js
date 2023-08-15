@@ -69,8 +69,8 @@ export const protect = async (req, res, next) => {
         // if token is retrieved from authorization header
         if (process.env.USE_TOKEN_FROM !== 'cookie') {
             // check if token is in black list if it is reject if not continue:
-            const tokenService = new TokenService({ username }, token, decoded);
-            const isInBlackList = await tokenService.checkIfTokenIsInBlackList();
+            const tokenService = new TokenService(username, token, decoded);
+            const isInBlackList = await tokenService.checkIfTokenIsInBlackList(username);
 
             if (isInBlackList) {
                 return next(new ErrorResponse(constants.MESSAGE.TOKEN_IN_BLACK_LIST, constants.STATUS_CODE.NOT_AUTHORIZED));
