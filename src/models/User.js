@@ -3,7 +3,7 @@ import { sequelize } from '../db/database.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { DataTypes } from 'sequelize';
-import { createHashedPassword } from '../utils/bcrypt.js';
+import AuthenticationService from '../services/AuthenticationService.js';
 
 dotenv.config();
 
@@ -75,7 +75,8 @@ const User = sequelize.define('User', {
 // Before save the user hash the password in a hook, because it looks that getters and setters does not support asyc operations.
 User.beforeCreate(async (user, options) => {
     // hash the password just before store the user in the database
-    user.password = await createHashedPassword(user.password);
+    const authService = new AuthenticationService();
+    user.password = await authService.createHashedPassword(user.password);
 });
 
 // create association many-to-many, with friends alias. It should be placed here, so it would be created once

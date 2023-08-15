@@ -1,9 +1,9 @@
 import UserService from '../services/UserService.js';
 import FileStorageService from '../services/FileStorageService.js';
+import AuthenticationService from '../services/AuthenticationService.js';
 import asyncMiddleware from '../middleware/asyncMiddleware.js';
 import ErrorResponse from '../utils/ErrorResponse.js';
 import constants from '../constants/constants.js';
-import { createHashedPassword } from '../utils/bcrypt.js';
 import removeSensitiveInformation from '../utils/removeSensitiveInformation.js';
 
 export const createUser = asyncMiddleware(async (req, res, next) => {
@@ -92,6 +92,7 @@ export const getAllUsers = asyncMiddleware(async (req, res, next) => {
 export const resetPassword = asyncMiddleware(async (req, res, next) => {
     const { password, username } = req.body;
     const userService = new UserService();
+    const authService = new AuthenticationService();
 
     // check if admin tries to update more params then password
     const doesTryingToUpdateMoreSettings = Object.keys(req.body).filter((setting) => setting !== 'password' & setting !== 'username').length !== 0;
@@ -105,7 +106,7 @@ export const resetPassword = asyncMiddleware(async (req, res, next) => {
     }
 
     // hash the new password
-    user.password = await createHashedPassword(password);
+    user.password = await authService.createHashedPassword(password);
 
     // save the new password
     await userService.saveUser(user);
